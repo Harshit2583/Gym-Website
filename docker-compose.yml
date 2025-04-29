@@ -4,5 +4,5 @@ services:
     build: .
     image: harshit2583/gym-website:latest
     ports:
-      - "80:80"
+      - "8081:80"
     restart: always
