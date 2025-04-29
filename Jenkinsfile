@@ -1,5 +1,4 @@
 pipeline {
-    agent any
 
     environment {
         IMAGE_NAME = "harshit2583/gym-website"
@@ -26,9 +25,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image..."
-                    // Using direct docker commands instead of docker plugin
-                    bat 'docker build -t ${IMAGE_NAME}:${BUILD_ID} .'
-                    env.IMAGE_ID = "${env.IMAGE_NAME}:${env.BUILD_ID}"
+                    bat "docker build -t %IMAGE_NAME%:%BUILD_ID% ."
                 }
             }
         }
@@ -37,10 +34,10 @@ pipeline {
             steps {
                 script {
                     echo "Running container to test..."
-                    bat 'docker run -d -p 8080:80 --name test-container ${IMAGE_ID}'
-                    bat 'ping 127.0.0.1 -n 10 > nul'  // 10 second delay
+                    bat "docker run -d -p 8080:80 --name test-container %IMAGE_NAME%:%BUILD_ID%"
+                    bat "ping 127.0.0.1 -n 10 > nul" // wait approx 10 seconds
                     echo "Container is running at http://localhost:8080"
-                    // Add test commands here if needed
+                    // Add test cases here, e.g., curl or integration tests
                 }
             }
         }
@@ -48,9 +45,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    echo "Deployment would happen here."
-                    // Example deployment command:
-                    // bat 'docker push ${IMAGE_ID}'
+                    echo "Deployment step (optional) would go here"
+                    // Uncomment below to push to Docker Hub
+                    // bat "docker login -u your-username -p your-password"
+                    // bat "docker push %IMAGE_NAME%:%BUILD_ID%"
                 }
             }
         }
