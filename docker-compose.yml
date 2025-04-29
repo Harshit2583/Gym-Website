@@ -5,17 +5,7 @@ services:
     build: .
     ports:
       - "8080:80"
+    container_name: gym-nginx
     volumes:
-      - .:/var/www/html
-    depends_on:
-      - db
-
-  db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: gymdb
-      MYSQL_USER: gymuser
-      MYSQL_PASSWORD: gympass
-    ports:
-      - "3306:3306"
+      - .:/usr/share/nginx/html
+    restart: always
