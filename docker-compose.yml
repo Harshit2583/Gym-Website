@@ -1,11 +1,9 @@
 version: '3.8'
 
 services:
-  web:
+  gym-website:
+    image: harshit2583/gym-website:latest
     build: .
     ports:
-      - "8080:80"
-    container_name: gym-nginx
-    volumes:
-      - .:/usr/share/nginx/html
+      - "80:80"
     restart: always

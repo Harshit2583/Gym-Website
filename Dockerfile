@@ -1,16 +1,11 @@
-# Use the official Nginx base image
+# Use official Nginx image as base
 FROM nginx:alpine
 
-# Remove the default nginx index page
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy all your website files into the nginx web root
+# Copy website files to Nginx directory
 COPY . /usr/share/nginx/html
 
-# Optional: Fix permissions (useful if you face permission issues)
-RUN chmod -R 755 /usr/share/nginx/html
-
-# Expose port 80 to the host
+# Expose port 80
 EXPOSE 80
 
-# Nginx is started by default in this image
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
