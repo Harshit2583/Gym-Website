@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $IMAGE_NAME .'
+                    bat 'docker build -t $IMAGE_NAME .'
                 }
             }
         }
@@ -25,7 +25,7 @@ pipeline {
         stage('Cleanup Old Container') {
             steps {
                 script {
-                    sh """
+                    bat """
                     docker stop $CONTAINER_NAME || true
                     docker rm $CONTAINER_NAME || true
                     """
@@ -36,7 +36,7 @@ pipeline {
         stage('Deploy New Container') {
             steps {
                 script {
-                    sh 'docker run -d --name $CONTAINER_NAME -p $PORT:80 $IMAGE_NAME'
+                    bat 'docker run -d --name $CONTAINER_NAME -p $PORT:80 $IMAGE_NAME'
                 }
             }
         }
