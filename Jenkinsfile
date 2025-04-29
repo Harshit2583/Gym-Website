@@ -26,8 +26,8 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image..."
-                    dockerImage = docker.build("${env.IMAGE_NAME}:${env.BUILD_ID}")
-                    // Save image ID for reuse in next stages
+                    // Using direct docker commands instead of docker plugin
+                    bat 'docker build -t ${IMAGE_NAME}:${BUILD_ID} .'
                     env.IMAGE_ID = "${env.IMAGE_NAME}:${env.BUILD_ID}"
                 }
             }
@@ -37,14 +37,10 @@ pipeline {
             steps {
                 script {
                     echo "Running container to test..."
-                    def builtImage = docker.image(env.IMAGE_ID)
-                    builtImage.withRun('-p 8080:80') { container ->
-                        // On Windows, we need to use ping for delay instead of sleep
-                        bat 'ping 127.0.0.1 -n 10 > nul'  // 10 second delay
-                        echo "Container is running at http://localhost:8080"
-                        // You can add actual tests like:
-                        // bat 'curl --fail http://localhost:8080'
-                    }
+                    bat 'docker run -d -p 8080:80 --name test-container ${IMAGE_ID}'
+                    bat 'ping 127.0.0.1 -n 10 > nul'  // 10 second delay
+                    echo "Container is running at http://localhost:8080"
+                    // Add test commands here if needed
                 }
             }
         }
@@ -53,10 +49,8 @@ pipeline {
             steps {
                 script {
                     echo "Deployment would happen here."
-                    // Uncomment and configure to push:
-                    // docker.withRegistry('', 'docker-hub-credentials-id') {
-                    //     docker.image(env.IMAGE_ID).push()
-                    // }
+                    // Example deployment command:
+                    // bat 'docker push ${IMAGE_ID}'
                 }
             }
         }
@@ -66,6 +60,8 @@ pipeline {
         always {
             script {
                 echo "Cleaning up Docker resources..."
+                bat 'docker stop test-container || echo "No container to stop"'
+                bat 'docker rm test-container || echo "No container to remove"'
                 bat 'docker system prune -f'
             }
         }
