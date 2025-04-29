@@ -12,8 +12,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t html-app .'
-    }
-}
+            }
+        }
 
         stage('Deploy') {
             steps {
