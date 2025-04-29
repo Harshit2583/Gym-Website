@@ -5,9 +5,6 @@ pipeline {
         IMAGE_NAME = "harshit2583/gym-website"
     }
 
-    // Declare dockerImage at top level to be accessible in all stages
-    def dockerImage
-
     stages {
         stage('Check Docker') {
             steps {
@@ -28,14 +25,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    try {
-                        echo "Building Docker image..."
-                        dockerImage = docker.build("${env.IMAGE_NAME}:${env.BUILD_ID}")
-                        echo "Built image: ${env.IMAGE_NAME}:${env.BUILD_ID}"
-                    } catch (err) {
-                        echo "Docker build failed: ${err}"
-                        error("Stopping pipeline due to Docker build failure.")
-                    }
+                    echo "Building Docker image..."
+                    dockerImage = docker.build("${env.IMAGE_NAME}:${env.BUILD_ID}")
+                    // Save image ID for reuse in next stages
+                    env.IMAGE_ID = "${env.IMAGE_NAME}:${env.BUILD_ID}"
                 }
             }
         }
@@ -44,10 +37,12 @@ pipeline {
             steps {
                 script {
                     echo "Running container to test..."
-                    dockerImage.withRun('-p 8080:80') { container ->
+                    def builtImage = docker.image(env.IMAGE_ID)
+                    builtImage.withRun('-p 8080:80') { container ->
                         sleep(10) // Allow container to start
                         echo "Container is running at http://localhost:8080"
-                        // You can add actual health checks or curl commands here
+                        // You can add actual tests like:
+                        // sh 'curl --fail http://localhost:8080'
                     }
                 }
             }
@@ -57,9 +52,9 @@ pipeline {
             steps {
                 script {
                     echo "Deployment would happen here."
-                    // To push to Docker Hub (when ready):
+                    // Uncomment and configure to push:
                     // docker.withRegistry('', 'docker-hub-credentials-id') {
-                    //     dockerImage.push("${env.BUILD_ID}")
+                    //     docker.image(env.IMAGE_ID).push()
                     // }
                 }
             }
