@@ -1,28 +1,43 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "gym-website"
+        CONTAINER_NAME = "gym-website-container"
+        PORT = "8080"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Harshit2583/Gym-Website.git'
+                git branch: 'main', url: 'https://github.com/Harshit2583/Gym-Website.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t html-app .'
+                script {
+                    sh 'docker build -t $IMAGE_NAME .'
+                }
             }
         }
 
         stage('Cleanup Old Container') {
             steps {
-                bat 'docker rm -f my-webapp || exit 0'
+                script {
+                    sh """
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                    """
+                }
             }
         }
 
         stage('Deploy New Container') {
             steps {
-                bat 'docker run -d -p 8080:80 --name my-webapp html-app'
+                script {
+                    sh 'docker run -d --name $CONTAINER_NAME -p $PORT:80 $IMAGE_NAME'
+                }
             }
         }
     }

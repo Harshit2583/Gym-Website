@@ -1,8 +1,8 @@
-version: '3'
+version: '3.8'
+
 services:
   web:
-    image: html-app
     build: .
     ports:
       - "8080:80"
-    container_name: my-webapp
+    container_name: gym-website-container
