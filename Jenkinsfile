@@ -11,13 +11,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t html-app .'
-            }
-        }
+                bat 'docker build -t html-app .'
+    }
+}
 
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 8080:80 --name my-webapp html-app'
+                bat 'docker run -d -p 8080:80 --name my-webapp html-app'
             }
         }
     }
