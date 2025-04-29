@@ -9,9 +9,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', 
-                url: 'https://github.com/Harshit2583/Gym-Website.git',
-                credentialsId: 'github-credentials'
+                checkout([$class: 'GitSCM', 
+                         branches: [[name: 'main']],
+                         userRemoteConfigs: [[url: 'https://github.com/Harshit2583/Gym-Website.git']]])
             }
         }
         
@@ -33,7 +33,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
+                    docker.withRegistry('', env.DOCKERHUB_CREDENTIALS) {
                         docker.image("${IMAGE_NAME}:${env.BUILD_NUMBER}").push()
                         docker.image("${IMAGE_NAME}:latest").push()
                     }
@@ -53,15 +53,15 @@ pipeline {
     post {
         always {
             echo 'Pipeline completed'
-            cleanWs()
+            // Remove cleanWs() as it was causing errors
         }
         success {
             echo 'Pipeline succeeded!'
-            slackSend(color: 'good', message: "Pipeline SUCCESSFUL: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            // Removed slackSend as you don't have the plugin installed
         }
         failure {
             echo 'Pipeline failed!'
-            slackSend(color: 'danger', message: "Pipeline FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            // Removed slackSend as you don't have the plugin installed
         }
     }
 }
