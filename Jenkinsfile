@@ -10,7 +10,7 @@ pipeline {
             steps {
                 script {
                     echo "Checking Docker installation..."
-                    sh 'docker --version'
+                    bat 'docker --version'
                 }
             }
         }
@@ -39,10 +39,11 @@ pipeline {
                     echo "Running container to test..."
                     def builtImage = docker.image(env.IMAGE_ID)
                     builtImage.withRun('-p 8080:80') { container ->
-                        sleep(10) // Allow container to start
+                        // On Windows, we need to use ping for delay instead of sleep
+                        bat 'ping 127.0.0.1 -n 10 > nul'  // 10 second delay
                         echo "Container is running at http://localhost:8080"
                         // You can add actual tests like:
-                        // sh 'curl --fail http://localhost:8080'
+                        // bat 'curl --fail http://localhost:8080'
                     }
                 }
             }
@@ -65,7 +66,7 @@ pipeline {
         always {
             script {
                 echo "Cleaning up Docker resources..."
-                sh 'docker system prune -f'
+                bat 'docker system prune -f'
             }
         }
     }
