@@ -1,8 +1,8 @@
-version: '3.8'
+version: '3'
 services:
-  gym-website:
+  web:
+    image: html-app
     build: .
-    image: harshit2583/gym-website:latest
     ports:
-      - "8081:80"
-    restart: always
+      - "8080:80"
+    container_name: my-webapp
