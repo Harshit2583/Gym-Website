@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Define IMAGE_NAME if it's not already set
         IMAGE_NAME = 'my-gym-app'  // You can replace this with your actual image name
     }
 
